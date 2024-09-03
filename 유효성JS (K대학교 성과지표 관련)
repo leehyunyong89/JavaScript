@@ -1,0 +1,1462 @@
+
+
+//플래그 전역 변수들을 저장하는 Registry 배열 초기화
+const globalRegistry_FlagVars = [];
+
+
+//지표항목 (A,B,C...) 저장하는 전역 변수 설정
+let arr_indicatorItems;
+
+//지표산출식 검증 버튼 클릭했는지 판단하는 플래그 전역 변수 설정
+let Flag_chkIndicatorItemValidation;
+
+
+// 라벨을 동적으로 변경하기 위한 카운터 변수
+let indicatorCounter = 66; // ASCII 'B'의 값
+let currentIndicatorCounter;
+let chkNextItemExistLable;
+
+//전역 변수 초기화 함수
+function initializeGlobals() {
+    arr_indicatorItems = ["A"];
+    //Flag_chkIndicatorItemValidation = "N";
+
+    //지표산출식 검증 버튼 클릭했는지 판단하는 플래그 전역 변수 설정
+    const globalFlagChkIndicatorItemValidationName = "Flag_chkIndicatorItemValidation";
+    window[globalFlagChkIndicatorItemValidationName] = "N";
+    globalRegistry_FlagVars.push('Flag_chkIndicatorItemValidation');
+    console.log("Global variable arr_indicatorItems is initialized");
+    console.log(`Global variable Flag_chkIndicatorItemValidation is initialized to ${window[globalFlagChkIndicatorItemValidationName]}`);
+    console.log('Global variable Flag_chkIndicatorItemValidation added to globalRegistry_FlagVars');
+    console.log(`globalRegistry_FlagVars : ${globalRegistry_FlagVars}`);
+    console.log(`first state window[Flag_chkIndicatorItemValidation] : ${window["Flag_chkIndicatorItemValidation"]}`);
+}
+
+
+//수정 모드 시 전역 변수 초기화 함수
+function initializeGlobals_editMode() {
+    arr_indicatorItems = [];
+    indicatorCounter = 65; // ASCII 'A'의 값
+
+    //지표산출식 검증 버튼 클릭했는지 판단하는 플래그 전역 변수 설정
+    const globalFlagChkIndicatorItemValidationName = "Flag_chkIndicatorItemValidation";
+    window[globalFlagChkIndicatorItemValidationName] = "N";
+    globalRegistry_FlagVars.push('Flag_chkIndicatorItemValidation');
+    console.log("Global variable arr_indicatorItems is initialized");
+    console.log(`Global variable Flag_chkIndicatorItemValidation is initialized to ${window[globalFlagChkIndicatorItemValidationName]}`);
+    console.log('Global variable Flag_chkIndicatorItemValidation added to globalRegistry_FlagVars');
+    console.log(`globalRegistry_FlagVars : ${globalRegistry_FlagVars}`);
+}
+
+
+
+//입력구분 추가 버튼 클릭 시 호출되는 함수
+function addPmiInputType() {
+
+    // 새로운 div 요소 생성 (input과 삭제 버튼을 감싸기 위해)
+    let newDiv = document.createElement("div");
+    newDiv.className = "input-group";
+    newDiv.style.padding = "3px";
+
+
+    // 새로운 input 요소 생성
+    let newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.className = "txt";
+    newInput.name = "directInputPmiInputType";
+
+    // 삭제 버튼 생성
+    let deleteButton = document.createElement("button");
+    deleteButton.innerText = "-";
+    deleteButton.style.backgroundColor = "lightcoral";
+    deleteButton.style.marginLeft = "5px";
+    deleteButton.onclick = function () {
+        //삭제 버튼 클릭 시 해당 div 요소 제거
+        newDiv.remove();
+
+    }
+
+    // 한 칸 띄우기 위해 br 태그 생성
+    let brTag = document.createElement("br");
+
+    // div 요소에 input,삭제버튼,br 태그 추가
+    newDiv.appendChild(newInput);
+    newDiv.appendChild(deleteButton);
+    newDiv.appendChild(brTag);
+
+    // 추가하고 싶은 영역에 div 요소 추가
+    let directInputArea = document.getElementById('directInputArea');
+    directInputArea.appendChild(newDiv);
+
+}
+
+//(수정 모드로 진입 시) 입력구분값 input value 채워주면서 요소 만들어주는 함수
+
+function makePmiInputType(inputVal) {
+
+    // 새로운 div 요소 생성 (input과 삭제 버튼을 감싸기 위해)
+    let newDiv = document.createElement("div");
+    newDiv.className = "input-group";
+    newDiv.style.padding = "3px";
+
+
+    // 새로운 input 요소 생성
+    let newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.className = "txt";
+    newInput.name = "directInputPmiInputType";
+    newInput.value = inputVal.PMIINPUTTYPEVALUE;
+
+    // 삭제 버튼 생성
+    let deleteButton = document.createElement("button");
+    deleteButton.innerText = "-";
+    deleteButton.style.backgroundColor = "lightcoral";
+    deleteButton.style.marginLeft = "5px";
+    deleteButton.onclick = function () {
+        //삭제 버튼 클릭 시 해당 div 요소 제거
+        newDiv.remove();
+
+    }
+
+    // 한 칸 띄우기 위해 br 태그 생성
+    let brTag = document.createElement("br");
+
+    // div 요소에 input,삭제버튼,br 태그 추가
+    newDiv.appendChild(newInput);
+    newDiv.appendChild(deleteButton);
+    newDiv.appendChild(brTag);
+
+    // 추가하고 싶은 영역에 div 요소 추가
+    let directInputArea = document.getElementById('directInputArea');
+    directInputArea.appendChild(newDiv);
+
+}
+
+
+// 세부입력값 추가 버튼 클릭 시 호출 함수
+function addIndicatorItem() {
+
+    //라벨 문자를 결정
+    let nextLabel = String.fromCharCode(indicatorCounter);
+
+    //지표항목 저장되는 전역 변수 arr_indicatorItems에 해당 지표항목(B,C,D...) 추가
+    arr_indicatorItems.push(nextLabel);
+    console.log(`${nextLabel} added to global array variable arr_indicatorItems`);
+    console.log(`arr_indicatorItems : ${arr_indicatorItems}`);
+
+    //지표산출식 placeholder 부분 바꿔주기
+    let inputPlaceHolderString = "";
+    for (let i = 0; i < arr_indicatorItems.length; i++) {
+        if (inputPlaceHolderString.length > 0) inputPlaceHolderString += "+";
+        inputPlaceHolderString += arr_indicatorItems[i];
+    }
+    let indicatorItemCalInputbox = document.getElementById("indicatorItemCalculator");
+    indicatorItemCalInputbox.setAttribute("placeholder", `예시 : ${inputPlaceHolderString}`);
+
+
+    //지표산출심 검증 버튼 클릭했는지 판단하는 플래그 전역 변수 'N'으로 바꿔주기
+    window["Flag_chkIndicatorItemValidation"] = "N";
+    console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+
+    // 라벨 요소 indicatorCounter 변수 1 증가
+    indicatorCounter++;
+
+    //새로운 indicatorItemArea 요소 생성
+    let newItemArea = document.createElement("div");
+    newItemArea.style.padding = "10px";
+    newItemArea.setAttribute("name", "indicatorItemArea");
+
+    //새로운 indicatorParentItemArea 요소 생성
+    let newParentItemArea = document.createElement("div");
+    newParentItemArea.setAttribute("name", `indicatorParentItemArea_${nextLabel}`);
+
+    //새로운 라벨 요소 생성
+    let newLabel = document.createElement("label");
+    newLabel.setAttribute("for", `indicatorItem_${nextLabel}`);
+    newLabel.style.marginRight = "5px";
+    newLabel.innerText = nextLabel;
+
+    //새로운 input 요소 생성
+    let newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.className = "txt";
+    newInput.name = `indicatorItem_${nextLabel}`;
+    newInput.id = `indicatorItem_${nextLabel}`;
+    newInput.style.marginRight = "5px";
+    newInput.title = "컨텍스트 검색을 지원합니다. 지표항목 입력 후 아래 나오는 검색 결과를 클릭해주세요.";
+    newInput.onkeyup = function () {
+        //searchItemList(this.id);
+        debounceSearchItemList(this.id);
+    }
+
+    //새로운 input hidden 요소 생성
+    let newInputHidden = document.createElement("input");
+    newInputHidden.type = "hidden";
+    newInputHidden.name = `indicatorItem_idx_${nextLabel}`;
+    newInputHidden.id = `indicatorItem_idx_${nextLabel}`;
+
+    //새로운 searchResult 요소 생성
+    let newSearchResultDiv = document.createElement("div");
+    newSearchResultDiv.id = `searchItemResult${nextLabel}`;
+    newSearchResultDiv.style.display = "none";
+    newSearchResultDiv.className = "search-result";
+
+    //새로운 하위항목 "+" 버튼 생성
+    let newButton = document.createElement("input");
+    newButton.type = "button";
+    newButton.value = "+";
+    newButton.name = "btn_addChildIndicatorItem";
+    newButton.style.backgroundColor = "chartreuse";
+    newButton.style.marginRight = "18px";
+    newButton.onclick = function () {
+        addChildIndicatorItem(nextLabel);
+    }
+
+    //새로운 산출식 라벨 요소 생성
+    let newCalLabel = document.createElement("label");
+    newCalLabel.setAttribute("for", `calCulatorItem_${nextLabel}`);
+    newCalLabel.setAttribute("name", `label_calCulatorItem_${nextLabel}`);
+    newCalLabel.setAttribute("id", `label_calCulatorItem_${nextLabel}`);
+    newCalLabel.style.marginRight = "5px";
+    newCalLabel.style.display = "none";
+    newCalLabel.innerText = `${nextLabel}에 대한 산출식`;
+
+    //새로운 산출식 input 요소 생성
+    let newCalInput = document.createElement("input");
+    newCalInput.type = "text";
+    newCalInput.className = "txt";
+    newCalInput.setAttribute("name", `calCulatorItem_${nextLabel}`)
+    newCalInput.setAttribute("id", `calCulatorItem_${nextLabel}`)
+    newCalInput.style.display = "none";
+    newCalInput.onkeyup = function () {
+        chgValidationStatus(nextLabel);
+    }
+
+
+    //새로운 산출식 검증 버튼 요소 생성
+    let newChkCalInputBtn = document.createElement("button");
+    newChkCalInputBtn.innerText = "산출식 검증";
+    newChkCalInputBtn.style.backgroundColor = "#afcbff";
+    newChkCalInputBtn.style.display = "none";
+    newChkCalInputBtn.style.marginLeft = "3px";
+    newChkCalInputBtn.setAttribute("id", `btn_chkChildIndicatorItemCalCulator_${nextLabel}`);
+    newChkCalInputBtn.setAttribute("name", `btn_chkChildIndicatorItemCalCulator_${nextLabel}`);
+    newChkCalInputBtn.onclick = function (event) {
+        chkRegExp(nextLabel, event);
+    }
+
+
+
+
+    //삭제 버튼 생성
+    let deleteButton = document.createElement("button");
+    deleteButton.innerText = "-";
+    deleteButton.style.backgroundColor = "lightcoral";
+    deleteButton.style.marginLeft = "5px";
+    deleteButton.onclick = function () {
+
+        //삭제 버튼 클릭 시 해당 div 요소 제거
+        if (document.getElementById(`indicatorItem_${String.fromCharCode(nextLabel.charCodeAt(0) + 1)}`)) {
+            alert('항목을 차례대로 삭제해주세요.');
+            return false;
+        }
+        else {
+            newItemArea.remove();
+            indicatorCounter--;
+        }
+
+
+        //하위 항목 카운팅 변수 저장하는 배열 변수 제거
+        let deleteArrayVariableName = `Arr_childItemCountingVariable_${nextLabel}`;
+        delete window[deleteArrayVariableName];
+        console.log(`Global Variable Deleted, Variable name : ${deleteArrayVariableName}`);
+
+        //하위 항목 카운팅 변수 제거
+        let deleteVariableName = `childItemCountingVariable_${nextLabel}`;
+        delete window[deleteVariableName];
+        console.log(`Global Variable Deleted, Variable name : ${deleteVariableName}`);
+
+        //하위 항목 산출식 검증 버튼 클릭했는지 체크하는 전역 변수 삭제하기
+        let deleteChkChildItemValidationVariableName = `Flag_chkChildItemValid_${nextLabel}`;
+        delete window[deleteChkChildItemValidationVariableName];
+        console.log(`Global Variable Delete, Variable Name : ${deleteChkChildItemValidationVariableName}`);
+
+        //지표항목 (A,B,C,...) 저장되는 배열에서 해당 ITEM 삭제하기
+        const index = arr_indicatorItems.indexOf(nextLabel);
+        if (index > -1) {
+            arr_indicatorItems.splice(index, 1);
+            console.log(`Value '${nextLabel}' removed from global array arr_indicatorItems, arr_indicatorItems : ${arr_indicatorItems}`);
+        }
+
+        //지표산출식 placeholder 부분 바꿔주기
+        let inputPlaceHolderString = "";
+        for (let i = 0; i < arr_indicatorItems.length; i++) {
+            if (inputPlaceHolderString.length > 0) inputPlaceHolderString += "+";
+            inputPlaceHolderString += arr_indicatorItems[i];
+        }
+        let indicatorItemCalInputbox = document.getElementById("indicatorItemCalculator");
+        indicatorItemCalInputbox.setAttribute("placeholder", `예시 : ${inputPlaceHolderString}`);
+
+
+        //지표산출심 검증 버튼 클릭했는지 판단하는 플래그 전역 변수 'N'으로 바꿔주기
+        window["Flag_chkIndicatorItemValidation"] = "N";
+        console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+
+    }
+
+    //새로운 하위항목 indicatoritem_ChildItem_Area 요소 생성
+    let newChildItemArea = document.createElement("div");
+    newChildItemArea.setAttribute("id", `indicatorChildItemArea_${nextLabel}`);
+
+
+    //새로운 요소들 추가
+    newParentItemArea.appendChild(newLabel);
+    newParentItemArea.appendChild(newInput);
+    newParentItemArea.appendChild(newInputHidden);
+    newParentItemArea.appendChild(newSearchResultDiv);
+    newParentItemArea.appendChild(newButton);
+    newParentItemArea.appendChild(newCalLabel);
+    newParentItemArea.appendChild(newCalInput);
+    newParentItemArea.appendChild(newChkCalInputBtn);
+    newParentItemArea.appendChild(deleteButton);
+
+    // indicatorItemArea에 새로운 요소들 추가
+    newItemArea.appendChild(newParentItemArea);
+    newItemArea.appendChild(newChildItemArea);
+
+
+    // indicatorItemTotalListArea에 새 요소들 추가
+    let indicatorItemTotalListArea = document.getElementById("indicatorItemTotalListArea");
+    indicatorItemTotalListArea.appendChild(newItemArea);
+
+}
+
+// 세부입력값의 하위 항목 추가 (+) 버튼 클릭 시 호출 함수
+function addChildIndicatorItem(parentItemIdx) {
+
+    // 하위 항목 카운팅 변수 생성
+    if (typeof window[`childItemCountingVariable_${parentItemIdx}`] === 'undefined') {
+        const childItemCountingVariableName = `childItemCountingVariable_${parentItemIdx}`;
+        const childItemCountingVariableValue = 1;
+        window[childItemCountingVariableName] = childItemCountingVariableValue;
+        console.log(`Global variable created : ${childItemCountingVariableName} = ${window[childItemCountingVariableName]}`);
+    }
+
+
+    // 하위 항목 카운팅 변수를 저장할 수 있는 배열 생성
+    if (typeof window[`Arr_childItemCountingVariable_${parentItemIdx}`] === 'undefined') {
+        const childItemCountingArrVariableName = `Arr_childItemCountingVariable_${parentItemIdx}`;
+        window[childItemCountingArrVariableName] = [];
+        console.log(`Global variable created : ${childItemCountingArrVariableName}`);
+    }
+
+
+    // 하위 항목 산출식 검증 버튼 클릭했는지 체크하는 플래그 변수 생성
+    if (typeof window[`Flag_chkChildItemValid_${parentItemIdx}`] === 'undefined') {
+        const chkChildItemValidVariableName = `Flag_chkChildItemValid_${parentItemIdx}`;
+        window[chkChildItemValidVariableName] = "N";
+        console.log(`Global variable created : ${chkChildItemValidVariableName} = ${window[chkChildItemValidVariableName]}`);
+
+
+        //플래그 변수를 Global Registry에 등록 (해당 요소가 없을 때만 등록)
+        if (globalRegistry_FlagVars.indexOf(chkChildItemValidVariableName) === -1) {
+            globalRegistry_FlagVars.push(`${chkChildItemValidVariableName}`);
+            console.log(`Global variable ${chkChildItemValidVariableName} added to globalRegistry_FlagVars`);
+            console.log(`globalRegistry_FlagVars : ${globalRegistry_FlagVars}`);
+        }
+
+
+    } else { // 하위 항목 산출식 검증 버튼 클릭했는지 체크하는 플래그 변수 값을 N으로 설정
+        window[`Flag_chkChildItemValid_${parentItemIdx}`] = "N";
+        console.log(`Flag_chkChildItemValid_${parentItemIdx} value is changed to ` + window[`Flag_chkChildItemValid_${parentItemIdx}`]);
+    }
+
+
+
+
+    //만약 처음 클릭한 것이라면 하위 항목 두 개 만들기
+    if (window[`childItemCountingVariable_${parentItemIdx}`] == 1) {
+        for (let i = 0; i < 2; i++) {
+            createChildItemElement(parentItemIdx);
+        }
+
+        let element_label = document.getElementById(`label_calCulatorItem_${parentItemIdx}`);
+        element_label.style.display = "";
+
+
+        //산출식 검증 버튼 노출
+        let element_btn_chkChildIndicatorItemCalCulator = document.getElementById(`btn_chkChildIndicatorItemCalCulator_${parentItemIdx}`);
+        element_btn_chkChildIndicatorItemCalCulator.style.display = "";
+
+
+    }
+    else {
+        createChildItemElement(parentItemIdx);
+    }
+
+}
+
+
+// 세부입력값의 하위 항목 요소들 생성해주는 함수
+function createChildItemElement(parentItemIdx) {
+    //하위 항목 카운팅 변수 받아오기
+    let childItemCountNum = window[`childItemCountingVariable_${parentItemIdx}`];
+
+
+    //하위 항목 카운팅 변수를 배열에 저장하기
+    const arrayName = `Arr_childItemCountingVariable_${parentItemIdx}`;
+    if (typeof window[arrayName] !== undefined) {
+        window[arrayName].push(`${parentItemIdx}${childItemCountNum}`);
+        console.log(`Value added to ${arrayName}:`, window[arrayName]);
+    } else {
+        console.log(`Global array ${arrayName} is not defiend.`);
+    }
+
+    //산출식 입력폼에 Placeholder 채워넣기
+    let placeHolderString = "";
+    for (let i = 0; i < window[arrayName].length; i++) {
+        if (placeHolderString.length > 0) placeHolderString += "+";
+        placeHolderString += window[arrayName][i];
+    }
+    let element_calCulatorItem = document.getElementById(`calCulatorItem_${parentItemIdx}`);
+    element_calCulatorItem.style.display = "";
+    element_calCulatorItem.setAttribute("placeholder", `예시 : ${placeHolderString}`);
+
+    //새로운 div 요소 생성
+    let newDiv = document.createElement("div");
+    newDiv.setAttribute("name", `indicatorChildItem_${parentItemIdx}${childItemCountNum}`);
+    newDiv.style.padding = "3px";
+
+    //새로운 label 요소 생성 (for indicatorChildItem_A1)
+    let newChildLabel = document.createElement("label");
+    newChildLabel.setAttribute("for", `indicatorChildItem_${parentItemIdx}${childItemCountNum}`);
+    newChildLabel.style.marginRight = "5px";
+    newChildLabel.innerText = `${parentItemIdx}${childItemCountNum}`;
+
+    //새로운 input 요소 생성 (name=indicatorChildItem_A1)
+    let newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.className = "txt";
+    newInput.id = `indicatorChildItem_${parentItemIdx}${childItemCountNum}`;
+    newInput.name = `indicatorChildItem_${parentItemIdx}${childItemCountNum}`;
+    newInput.onkeyup = function () {
+        //searchItemList(this.id);
+        debounceSearchItemList(this.id);
+
+    }
+
+    //새로운 input hidden 요소 생성
+    let newInputHidden = document.createElement("input");
+    newInputHidden.type = "hidden";
+    newInputHidden.id = `indicatorChildItem_idx_${parentItemIdx}${childItemCountNum}`;
+    newInputHidden.name = `indicatorChildItem_idx_${parentItemIdx}${childItemCountNum}`;
+
+
+    //새로운 searchResult 요소 생성
+    let newSearchResultDiv = document.createElement("div");
+    newSearchResultDiv.id = `searchItemResult${parentItemIdx}${childItemCountNum}`;
+    newSearchResultDiv.style.display = "none";
+    newSearchResultDiv.className = "search-result";
+
+
+    //newDiv 에 추가된 요소들 추가            
+    newDiv.appendChild(newChildLabel);
+    newDiv.appendChild(newInput);
+    newDiv.appendChild(newInputHidden);
+    newDiv.appendChild(newSearchResultDiv);
+
+
+    //새로운 삭제 버튼 생성 (첫 번째 하위 항목에는 삭제버튼 만들지 말기)
+    if (childItemCountNum !== 1) {
+
+
+        let deleteButton = document.createElement("button");
+        deleteButton.innerText = "-";
+        deleteButton.style.backgroundColor = "lightcoral";
+        deleteButton.style.marginLeft = "5px";
+        deleteButton.onclick = function () {
+
+            //삭제 버튼 클릭 시 해당 div 요소 제거
+            if (document.getElementById(`indicatorChildItem_${parentItemIdx}${childItemCountNum + 1}`)) {
+                alert('항목을 차례대로 삭제해주세요.');
+                return false;
+            }
+            else {
+
+                //만약 두 번째 항목을 삭제한 경우에는 child1,child2 요소 두 개 다 지우기
+                if (window[`childItemCountingVariable_${parentItemIdx}`] == 3) {
+                    document.getElementById(`indicatorChildItem_${parentItemIdx}${childItemCountNum}`).parentElement.remove();
+                    document.getElementById(`indicatorChildItem_${parentItemIdx}${childItemCountNum - 1}`).parentElement.remove();
+
+                    //하위 항목 카운팅 변수 저장 배열 초기화해주기
+                    window[arrayName].length = 0;
+
+                    //하위 항목 카운팅 변수 2 줄이기
+                    window[`childItemCountingVariable_${parentItemIdx}`] = window[`childItemCountingVariable_${parentItemIdx}`] - 2;
+
+                    //하위 항목 산출식 검증 버튼 클릭했는지 체크하는 전역 변수 삭제하기
+                    let deleteChkChildItemValidationVariableName = `Flag_chkChildItemValid_${parentItemIdx}`;
+                    delete window[deleteChkChildItemValidationVariableName];
+                    console.log(`Global Variable Delete, Variable Name : ${deleteChkChildItemValidationVariableName}`);
+                }
+                else {
+                    newDiv.remove();
+
+                    //하위 항목 카운팅 변수 저장 배열에서 해당 항목 삭제하기
+                    const index = window[arrayName].indexOf(`${parentItemIdx}${childItemCountNum}`);
+                    if (index > -1) {
+                        window[arrayName].splice(index, 1);
+                    }
+
+                    //산출식 입력폼 Placeholder에서 해당 요소 빼주기
+                    placeHolderString = "";
+                    for (let i = 0; i < window[arrayName].length; i++) {
+                        if (placeHolderString.length > 0) placeHolderString += "+";
+                        placeHolderString += window[arrayName][i];
+                    }
+                    element_calCulatorItem.setAttribute("placeholder", `예시 : ${placeHolderString}`);
+
+
+                    //하위 항목 카운팅 변수 1 줄이기
+                    window[`childItemCountingVariable_${parentItemIdx}`] = window[`childItemCountingVariable_${parentItemIdx}`] - 1;
+
+                    //하위 항목 산출식 검증 Flag 변수를 N으로 바꿔주기
+                    const FlagVariableName = `Flag_chkChildItemValid_${parentItemIdx}`;
+                    window[FlagVariableName] = "N";
+                    console.log(`${FlagVariableName} value is changed to ${window[FlagVariableName]}`);
+                }
+
+            }
+
+            //만약 하위 항목 다 지웠을 경우에는 산출식 부분 값 초기화해주기.
+            if (window[`childItemCountingVariable_${parentItemIdx}`] == 1) {
+                let element_label = document.getElementById(`label_calCulatorItem_${parentItemIdx}`);
+                element_label.style.display = "none";
+
+                let element_calCulatorItem = document.getElementById(`calCulatorItem_${parentItemIdx}`);
+                element_calCulatorItem.style.display = "none";
+                element_calCulatorItem.value = "";
+
+
+                let element_btn_chkChildIndicatorItemCalCulator = document.getElementById(`btn_chkChildIndicatorItemCalCulator_${parentItemIdx}`);
+                element_btn_chkChildIndicatorItemCalCulator.style.display = "none";
+
+            }
+        }
+        newDiv.appendChild(deleteButton);
+    }
+
+    // indicatorChildItemArea 에 newDiv 요소 추가
+    let indicatorChildItemArea = document.getElementById(`indicatorChildItemArea_${parentItemIdx}`);
+    indicatorChildItemArea.appendChild(newDiv);
+
+    // 하위 항목 카운팅 변수 1 증가시키기
+    window[`childItemCountingVariable_${parentItemIdx}`] = window[`childItemCountingVariable_${parentItemIdx}`] + 1;
+}
+
+
+
+
+
+
+
+
+
+
+let debounceTimeout;
+function debounceSearchItemList(id) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(function () {
+        searchItemList(id);
+    }, 300);
+}
+
+
+
+// 지표항목 검색 ajax 함수
+function searchItemList(id) {
+
+
+    const query = $(`#${id}`).val();
+    let splitIdValue = id.split('_')[1];
+
+
+    if (query.length === 0) {
+        $(`#${id}`).val('');
+        if (splitIdValue.length == 1) {
+            $(`#indicatorItem_idx_${splitIdValue}`).val('');
+        }
+        else if (splitIdValue.length == 2) {
+            $(`#indicatorChildItem_idx_${splitIdValue}`).val('');
+        }
+        $(`#searchItemResult${splitIdValue}`).empty();
+        $(`#searchItemResult${splitIdValue}`).hide();
+
+        return;
+    }
+
+
+    $.ajax({
+        url: 'PerformanceIndicatorForm.aspx/SearchItem', // 웹 메서드 URL
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify({ q: query }),
+        success: function (response) {
+            const items = response.d;
+            const searchResult = $(`#searchItemResult${splitIdValue}`);
+            searchResult.empty();
+
+            if (items.length > 0) {
+                items.forEach(function (item) {
+                    const div = $('<div>').text(item.ItemTitle);
+                    div.addClass('result-item');
+                    div.on('click', function () {
+                        selectItem(id, item);
+                    });
+                    searchResult.append(div);
+                });
+                searchResult.show();
+            } else {
+                /*searchResult.hide();*/
+                const div = $('<div>').text('일치하는 지표 항목이 없습니다. 다시 검색해주세요.');
+                searchResult.append(div);
+                searchResult.show();
+            }
+
+
+        }
+    });
+
+}
+
+
+
+
+// 검색된 지표항목 클릭 시 호출되는 함수
+function selectItem(id, item) {
+
+    let splitIdValue = id.split('_')[1];
+
+    $(`#${id}`).val(item.ItemTitle);
+
+    if (splitIdValue.length == 1) {
+        $(`#indicatorItem_idx_${splitIdValue}`).val(item.ItemIdx);
+    }
+    else if (splitIdValue.length == 2) {
+        $(`#indicatorChildItem_idx_${splitIdValue}`).val(item.ItemIdx);
+    }
+
+    $(`#searchItemResult${splitIdValue}`).hide();
+
+
+}
+
+
+// 담당자 검색 시 호출되는 AJAX 함수
+function searchProfessor() {
+    const query = $('#userName').val();
+
+    if (query.length === 0) {
+        $('#_PMIMANAGERMUID').val('');
+        $('#searchResult').hide();
+        return;
+    }
+
+    $.ajax({
+        url: 'PerformanceIndicatorForm.aspx/SearchProfessor', // 웹 메서드 URL
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify({ q: query }),
+        success: function (response) {
+            const professors = response.d;
+            const searchResult = $('#searchResult');
+            searchResult.empty();
+
+            if (professors.length > 0) {
+                professors.forEach(function (professor) {
+                    const div = $('<div>').text(professor.Username + ' / ' + professor.Deptment + ' / ' + professor.Muid);
+                    div.addClass('result-item');
+                    div.on('click', function () {
+                        selectProfessor(professor);
+                    });
+                    searchResult.append(div);
+                });
+                searchResult.show();
+            } else {
+                searchResult.hide();
+            }
+        }
+    });
+}
+
+//선택된 담당자 클릭 시 호출되는 함수
+
+function selectProfessor(professor) {
+    $('#userName').val(professor.Username);
+    $('#_PMIMANAGERMUID').val(professor.Muid);
+    $('#searchResult').hide();
+}
+
+
+
+//산출식에 대한 RegExp 함수
+function chkRegExp(inputFiledId, event) {
+
+    if (event) event.preventDefault();
+
+    // 하위 항목 카운팅 변수 저장 배열 찾아오기
+    const arrayName = `Arr_childItemCountingVariable_${inputFiledId}`;
+
+    // 산출식 검증 버튼 클릭 여부 체크하는 변수 찾아오기
+    const chkValidationFlagName = `Flag_chkChildItemValid_${inputFiledId}`;
+
+    let inputElement = document.getElementById(`calCulatorItem_${inputFiledId}`);
+
+    const validPatternString = `^(?![+\\-*/])(${inputFiledId}[1-${window[arrayName].length}]|[+\\-*/()]|[0-9]+(\\.[0-9]+)?)*$`;
+
+    const validPatternRegExp = new RegExp(validPatternString);
+
+    if (inputElement.value.length == 0) {
+        alert('산출식을 입력해주세요.');
+        inputElement.focus();
+        window[chkValidationFlagName] = "N";
+        console.log(`산출식 검증 유효성 : ${window[chkValidationFlagName]}`);
+        return false;
+    } else {
+        if (validPatternRegExp.test(inputElement.value)) {
+
+            //각 하위항목 요소들 적어도 한 번씩은 포함되었는지 확인하는 유효성
+            for (let unit of window[arrayName]) {
+                if (!new RegExp(`\\b${unit}\\b`).test(inputElement.value)) {
+                    alert(`${inputFiledId}1~${inputFiledId}${window[arrayName].length} 까지 각 항목들을 적어도 한 번씩은 포함해야 합니다.`)
+                    window[chkValidationFlagName] = "N";
+                    console.log(`산출식 검증 유효성 : ${window[chkValidationFlagName]}`);
+                    return false;
+                }
+            }
+            alert('산출식이 유효합니다.');
+            window[chkValidationFlagName] = "Y";
+            console.log(`산출식 검증 유효성 통과 ${chkValidationFlagName} : ${window[chkValidationFlagName]}`);
+
+
+        } else {
+            alert(`입력 가능 텍스트 : ${inputFiledId}1~${inputFiledId}${window[arrayName].length} 까지의 텍스트, 사칙연산 기호 (*/+-), 괄호()`);
+            window[chkValidationFlagName] = "N";
+            console.log(`산출식 검증 유효성 : ${window[chkValidationFlagName]}`);
+            return false;
+        }
+    }
+}
+
+
+
+//산출식 onkeyup 함수
+function chgValidationStatus(parentIdx) {
+    window[`Flag_chkChildItemValid_${parentIdx}`] = "N";
+    console.log(`Flag_chkChildItemValid_${parentIdx} value is changed to ` + window[`Flag_chkChildItemValid_${parentIdx}`]);
+}
+
+
+
+
+//지표산출식 검증 함수
+function chkTotRegExp(event) {
+
+    if (event) event.preventDefault();
+
+    // 지표산출식 입력값 받아오기
+    let inputElement = document.getElementById("indicatorItemCalculator");
+    let inputValue = inputElement.value;
+
+
+    // 지표 항목 변수 저장 배열값을 가져와서 정규식 문자열 클래스 만들어주기    
+    const arrayPattern = arr_indicatorItems.map(item => `\\b${item}\\b`).join('|');
+
+    // 정규식 패턴 만들기    
+    const validPatternString = `^(?![+\\-*/])((?:${arrayPattern})|[+\\-*/()]|[0-9]+(\\.[0-9]+)?)*$`;
+    const validPatternRegExp = new RegExp(validPatternString);
+
+    if (inputValue.length == 0) {
+        alert('지표산출식을 입력해주세요.');
+        inputElement.focus();
+        window["Flag_chkIndicatorItemValidation"] = "N";
+        console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+        return false;
+    }
+
+
+    // 전체 입력값 검증
+    if (!validPatternRegExp.test(inputValue)) {
+        alert(`입력 가능 텍스트 : ${arr_indicatorItems.join(', ')} , 사칙연산 기호 (*/+-), 괄호()`);
+        window["Flag_chkIndicatorItemValidation"] = "N";
+        console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+        return false;
+    }
+
+    // 지표 항목 한 번씩 모두 포함되었는지 검증
+    for (let value of arr_indicatorItems) {
+        if (!new RegExp(`\\b${value}\\b`).test(inputValue)) {
+            alert(`지표항목들 (${arr_indicatorItems.join(', ')})이 적어도 한 번씩은 포함되어야 합니다. `);
+            window["Flag_chkIndicatorItemValidation"] = "N";
+            console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+            return false;
+        }
+    }
+
+    //아무것도 안 걸리면 정규식 검증 통과
+    alert('지표산출식이 유효합니다.');
+    window["Flag_chkIndicatorItemValidation"] = "Y";
+    console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+}
+
+
+function chgChkValidationStatus() {
+    window["Flag_chkIndicatorItemValidation"] = "N";
+    console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+}
+
+
+//세부입력값 모두 입력했는지 체크하는 유효성 함수
+function chkNullValueInIndicatorItems() {
+
+
+    //name이 indicatorItem_idx 로 시작되는 hidden 인풋값들 모두 돌면서 null 이면 false 반환시키기.
+    let inputElements_indicatorItems = document.querySelectorAll('[name^="indicatorItem_idx"]');
+    for (let element of inputElements_indicatorItems) {
+        if (element.value.length === 0) {
+            return false;
+        }
+    }
+
+    //name이 indicatorChildItem_idx 로 시작되는 hidden 인풋값들 모두 돌면서 null 이면 false 반환시키기.
+    let inputElements_indicatorChildItems = document.querySelectorAll('[name^="indicatorChildItem_idx"]');
+    for (let element of inputElements_indicatorChildItems) {
+        if (element.value.length === 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+//산출식 검증 모두 체크 했는지 확인하는 유효성 함수
+function chkAllVaidationFunc() {
+    console.log("Global Flag variables:");
+    console.log(globalRegistry_FlagVars);
+
+    for (let varName of globalRegistry_FlagVars) {
+
+        if (window[varName] !== undefined) {
+
+            if (window[varName] === "N") {
+                let alertMessage = "";
+                let indexString = "";
+
+                if (varName === "Flag_chkIndicatorItemValidation") {
+                    alertMessage = "지표산출식 검증 유효성을 통과하지 못했습니다. 지표산출식 검증 이후 다시 시도해주세요.";
+                } else {
+                    indexString = varName.charAt(varName.length - 1);
+                    alertMessage = `${indexString} 항목 산출식 검증 유효성을 통과하지 못했습니다. ${indexString} 항목 산출식 검증 이후 다시 시도해주세요.`;
+                }
+
+                alert(alertMessage);
+                return false;
+            }
+        } else {
+            console.log(`${varName} 변수는 중간에 삭제된 플래그 변수입니다.유효성 검증 필요 X`);
+        }
+    }
+    return true;
+}
+
+
+//'직접입력' 데이터 바인딩 처리
+function fetchDataAndPopulate(decryptedIdx) {
+
+    $.ajax({
+        type: "POST",
+        url: "PerformanceIndicatorEditForm.aspx/GetinputTypes",
+        data: JSON.stringify({ idx: decryptedIdx }),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (response) {
+
+            let data = JSON.parse(response.d);
+
+            data.forEach(function (item, index) {
+                makePmiInputType(item);
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching data: " + error);
+        }
+    });
+}
+
+
+
+
+//'세부입력값' 데이터 바인딩 처리
+//function fetchDataAndPopulate02(decryptedIdx, itmeType) {
+
+//    $.ajax({
+//        type: "POST",
+//        url: "PerformanceIndicatorEditForm.aspx/GetPerformanceItems",
+//        data: JSON.stringify({ idx: decryptedIdx, type: itmeType }),
+//        contentType: "application/json; charset=utf-8",
+//        dataType: "json",
+//        success: function (response) {
+
+//            let data = JSON.parse(response.d);
+
+//            data.forEach(function (item, index) {
+//                addIndicatorItem_editMode(item);
+//            });
+
+
+//        },
+//        error: function (xhr, status, error) {
+//            console.error("Error fetching data: " + error);
+//        }
+//    });
+//}
+
+
+//'세부입력값' 데이터 바인딩 처리
+function fetchDataAndPopulate02(decryptedIdx, itemType) {
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "PerformanceIndicatorEditForm.aspx/GetPerformanceItems",
+            data: JSON.stringify({ idx: decryptedIdx, type: itemType }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                let data = JSON.parse(response.d);
+
+                data.forEach(function (item) {
+                    addIndicatorItem_editMode(item);
+                });
+
+                // Resolve the promise once all data is processed
+                resolve();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data: " + error);
+                reject(error);
+            }
+        });
+    });
+}
+
+
+//'세부입력값' 하위 데이터(A1,A2,B1,B2,...) 바인딩 처리
+//function fetchDataAndPopulate03(decryptedIdx, itmeType) {
+
+//    $.ajax({
+//        type: "POST",
+//        url: "PerformanceIndicatorEditForm.aspx/GetPerformanceItems",
+//        data: JSON.stringify({ idx: decryptedIdx, type: itmeType }),
+//        contentType: "application/json; charset=utf-8",
+//        dataType: "json",
+//        success: function (response) {
+
+//            let data = JSON.parse(response.d);
+//            data.forEach(function (item, index) {
+//                addChildIndicatorItem_editMode(item);
+//            });
+
+
+//        },
+//        error: function (xhr, status, error) {
+//            console.error("Error fetching data: " + error);
+//        }
+//    });
+//}
+
+
+//'세부입력값' 하위 데이터(A1,A2,B1,B2,...) 바인딩 처리
+function fetchDataAndPopulate03(decryptedIdx, itemType) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "PerformanceIndicatorEditForm.aspx/GetPerformanceItems",
+            data: JSON.stringify({ idx: decryptedIdx, type: itemType }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                let data = JSON.parse(response.d);
+                data.forEach(function (item) {
+                    addChildIndicatorItem_editMode(item);
+                });
+
+                // Resolve the promise once all data is processed
+                resolve();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data: " + error);
+                reject(error);
+            }
+        });
+    });
+}
+
+
+
+
+
+
+//수정 모드로 들어왔을 때 세부입력값(A,B,C...) 데이터 바인딩해주는 함수
+function addIndicatorItem_editMode(itemDataRow) {
+
+    //라벨 문자를 결정
+    let nextLabel = String.fromCharCode(indicatorCounter);
+
+    //지표항목 저장되는 전역 변수 arr_indicatorItems에 해당 지표항목(B,C,D...) 추가
+    arr_indicatorItems.push(nextLabel);
+    console.log(`${nextLabel} added to global array variable arr_indicatorItems`);
+    console.log(`arr_indicatorItems : ${arr_indicatorItems}`);
+
+    //지표산출식 placeholder 부분 바꿔주기
+    let inputPlaceHolderString = "";
+    for (let i = 0; i < arr_indicatorItems.length; i++) {
+        if (inputPlaceHolderString.length > 0) inputPlaceHolderString += "+";
+        inputPlaceHolderString += arr_indicatorItems[i];
+    }
+    let indicatorItemCalInputbox = document.getElementById("indicatorItemCalculator");
+    indicatorItemCalInputbox.setAttribute("placeholder", `예시 : ${inputPlaceHolderString}`);
+
+
+    //지표산출심 검증 버튼 클릭했는지 판단하는 플래그 전역 변수 'N'으로 바꿔주기
+    window["Flag_chkIndicatorItemValidation"] = "N";
+    console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+
+    // 라벨 요소 indicatorCounter 변수 1 증가
+    indicatorCounter++;
+
+    //새로운 indicatorItemArea 요소 생성
+    let newItemArea = document.createElement("div");
+    newItemArea.style.padding = "10px";
+    newItemArea.setAttribute("name", "indicatorItemArea");
+
+    //새로운 indicatorParentItemArea 요소 생성
+    let newParentItemArea = document.createElement("div");
+    newParentItemArea.setAttribute("name", `indicatorParentItemArea_${nextLabel}`);
+
+    //새로운 라벨 요소 생성
+    let newLabel = document.createElement("label");
+    newLabel.setAttribute("for", `indicatorItem_${nextLabel}`);
+    newLabel.style.marginRight = "5px";
+    newLabel.innerText = nextLabel;
+
+    //새로운 input 요소 생성
+    let newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.className = "txt";
+    newInput.name = `indicatorItem_${nextLabel}`;
+    newInput.id = `indicatorItem_${nextLabel}`;
+    newInput.value = itemDataRow.INDICATORITEMTITLE;
+    newInput.style.marginRight = "5px";
+    newInput.title = "컨텍스트 검색을 지원합니다. 지표항목 입력 후 아래 나오는 검색 결과를 클릭해주세요.";
+    newInput.onkeyup = function () {
+        //searchItemList(this.id);
+        debounceSearchItemList(this.id);
+    }
+
+    //새로운 input hidden 요소 생성
+    let newInputHidden = document.createElement("input");
+    newInputHidden.type = "hidden";
+    newInputHidden.name = `indicatorItem_idx_${nextLabel}`;
+    newInputHidden.id = `indicatorItem_idx_${nextLabel}`;
+    newInputHidden.value = itemDataRow.INDIDX;
+
+    //새로운 searchResult 요소 생성
+    let newSearchResultDiv = document.createElement("div");
+    newSearchResultDiv.id = `searchItemResult${nextLabel}`;
+    newSearchResultDiv.style.display = "none";
+    newSearchResultDiv.className = "search-result";
+
+    //새로운 하위항목 "+" 버튼 생성
+    let newButton = document.createElement("input");
+    newButton.type = "button";
+    newButton.value = "+";
+    newButton.name = "btn_addChildIndicatorItem";
+    newButton.style.backgroundColor = "chartreuse";
+    newButton.style.marginRight = "18px";
+    newButton.onclick = function () {
+        addChildIndicatorItem(nextLabel);
+    }
+
+    //새로운 산출식 라벨 요소 생성
+    let newCalLabel = document.createElement("label");
+    newCalLabel.setAttribute("for", `calCulatorItem_${nextLabel}`);
+    newCalLabel.setAttribute("name", `label_calCulatorItem_${nextLabel}`);
+    newCalLabel.setAttribute("id", `label_calCulatorItem_${nextLabel}`);
+    newCalLabel.style.marginRight = "5px";
+    newCalLabel.style.display = "none";
+    newCalLabel.innerText = `${nextLabel}에 대한 산출식`;
+
+    //새로운 산출식 input 요소 생성
+    let newCalInput = document.createElement("input");
+    newCalInput.type = "text";
+    newCalInput.className = "txt";
+    newCalInput.setAttribute("name", `calCulatorItem_${nextLabel}`)
+    newCalInput.setAttribute("id", `calCulatorItem_${nextLabel}`)
+    newCalInput.style.display = "none";
+    if (itemDataRow.CALCULATOR) {
+        newCalLabel.style.display = "";
+        newCalInput.style.display = "";
+        newCalInput.value = itemDataRow.CALCULATOR;
+    }
+
+
+    newCalInput.onkeyup = function () {
+        chgValidationStatus(nextLabel);
+    }
+
+
+    //새로운 산출식 검증 버튼 요소 생성
+    let newChkCalInputBtn = document.createElement("button");
+    newChkCalInputBtn.innerText = "산출식 검증";
+    newChkCalInputBtn.style.backgroundColor = "#afcbff";
+    newChkCalInputBtn.style.display = "none";
+    newChkCalInputBtn.style.marginLeft = "3px";
+    newChkCalInputBtn.setAttribute("id", `btn_chkChildIndicatorItemCalCulator_${nextLabel}`);
+    newChkCalInputBtn.setAttribute("name", `btn_chkChildIndicatorItemCalCulator_${nextLabel}`);
+    newChkCalInputBtn.onclick = function (event) {
+        chkRegExp(nextLabel, event);
+    }
+
+    if (itemDataRow.CALCULATOR) {
+        newChkCalInputBtn.style.display = "";
+    }
+
+
+
+
+
+    //삭제 버튼 생성 (A 일때는 삭제버튼 생성하지 말기)
+
+    let deleteButton = document.createElement("button");
+    deleteButton.innerText = "-";
+    deleteButton.style.backgroundColor = "lightcoral";
+    deleteButton.style.marginLeft = "5px";
+    deleteButton.onclick = function () {
+
+        //삭제 버튼 클릭 시 해당 div 요소 제거
+        if (document.getElementById(`indicatorItem_${String.fromCharCode(nextLabel.charCodeAt(0) + 1)}`)) {
+            alert('항목을 차례대로 삭제해주세요.');
+            return false;
+        }
+        else {
+            newItemArea.remove();
+            indicatorCounter--;
+        }
+
+
+        //하위 항목 카운팅 변수 저장하는 배열 변수 제거
+        let deleteArrayVariableName = `Arr_childItemCountingVariable_${nextLabel}`;
+        delete window[deleteArrayVariableName];
+        console.log(`Global Variable Deleted, Variable name : ${deleteArrayVariableName}`);
+
+        //하위 항목 카운팅 변수 제거
+        let deleteVariableName = `childItemCountingVariable_${nextLabel}`;
+        delete window[deleteVariableName];
+        console.log(`Global Variable Deleted, Variable name : ${deleteVariableName}`);
+
+        //하위 항목 산출식 검증 버튼 클릭했는지 체크하는 전역 변수 삭제하기
+        let deleteChkChildItemValidationVariableName = `Flag_chkChildItemValid_${nextLabel}`;
+        delete window[deleteChkChildItemValidationVariableName];
+        console.log(`Global Variable Delete, Variable Name : ${deleteChkChildItemValidationVariableName}`);
+
+        //지표항목 (A,B,C,...) 저장되는 배열에서 해당 ITEM 삭제하기
+        const index = arr_indicatorItems.indexOf(nextLabel);
+        if (index > -1) {
+            arr_indicatorItems.splice(index, 1);
+            console.log(`Value '${nextLabel}' removed from global array arr_indicatorItems, arr_indicatorItems : ${arr_indicatorItems}`);
+        }
+
+        //지표산출식 placeholder 부분 바꿔주기
+        let inputPlaceHolderString = "";
+        for (let i = 0; i < arr_indicatorItems.length; i++) {
+            if (inputPlaceHolderString.length > 0) inputPlaceHolderString += "+";
+            inputPlaceHolderString += arr_indicatorItems[i];
+        }
+        let indicatorItemCalInputbox = document.getElementById("indicatorItemCalculator");
+        indicatorItemCalInputbox.setAttribute("placeholder", `예시 : ${inputPlaceHolderString}`);
+
+
+        //지표산출심 검증 버튼 클릭했는지 판단하는 플래그 전역 변수 'N'으로 바꿔주기
+        window["Flag_chkIndicatorItemValidation"] = "N";
+        console.log(`Global variable Flag_chkIndicatorItemValidation is changed to ${window["Flag_chkIndicatorItemValidation"]}`);
+
+    }
+
+
+    //새로운 하위항목 indicatoritem_ChildItem_Area 요소 생성
+    let newChildItemArea = document.createElement("div");
+    newChildItemArea.setAttribute("id", `indicatorChildItemArea_${nextLabel}`);
+
+
+    //새로운 요소들 추가
+    newParentItemArea.appendChild(newLabel);
+    newParentItemArea.appendChild(newInput);
+    newParentItemArea.appendChild(newInputHidden);
+    newParentItemArea.appendChild(newSearchResultDiv);
+    newParentItemArea.appendChild(newButton);
+    newParentItemArea.appendChild(newCalLabel);
+    newParentItemArea.appendChild(newCalInput);
+    newParentItemArea.appendChild(newChkCalInputBtn);
+    newParentItemArea.appendChild(deleteButton);
+
+
+
+    // indicatorItemArea에 새로운 요소들 추가
+    newItemArea.appendChild(newParentItemArea);
+    newItemArea.appendChild(newChildItemArea);
+
+
+    // indicatorItemTotalListArea에 새 요소들 추가
+    let indicatorItemTotalListArea = document.getElementById("indicatorItemTotalListArea");
+    indicatorItemTotalListArea.appendChild(newItemArea);
+
+}
+
+
+
+
+
+
+// 세부입력값의 하위 항목값들 데이터 바인딩 함수
+function addChildIndicatorItem_editMode(parentItemDataRow) {
+
+    console.log(`parentItemDataRow.PARENTITEMIDX : ${parentItemDataRow.PARENTITEMIDX}`);
+
+    // 하위 항목 카운팅 변수 생성
+    if (typeof window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] === 'undefined') {
+        const childItemCountingVariableName = `childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`;
+        const childItemCountingVariableValue = 1;
+        window[childItemCountingVariableName] = childItemCountingVariableValue;
+        console.log(`Global variable created : ${childItemCountingVariableName} = ${window[childItemCountingVariableName]}`);
+    }
+
+
+    // 하위 항목 카운팅 변수를 저장할 수 있는 배열 생성
+    if (typeof window[`Arr_childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] === 'undefined') {
+        const childItemCountingArrVariableName = `Arr_childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`;
+        window[childItemCountingArrVariableName] = [];
+        console.log(`Global variable created : ${childItemCountingArrVariableName}`);
+    }
+
+
+    // 하위 항목 산출식 검증 버튼 클릭했는지 체크하는 플래그 변수 생성
+    if (typeof window[`Flag_chkChildItemValid_${parentItemDataRow.PARENTITEMIDX}`] === 'undefined') {
+        const chkChildItemValidVariableName = `Flag_chkChildItemValid_${parentItemDataRow.PARENTITEMIDX}`;
+        window[chkChildItemValidVariableName] = "N";
+        console.log(`Global variable created : ${chkChildItemValidVariableName} = ${window[chkChildItemValidVariableName]}`);
+
+
+        //플래그 변수를 Global Registry에 등록 (해당 요소가 없을 때만 등록)
+        if (globalRegistry_FlagVars.indexOf(chkChildItemValidVariableName) === -1) {
+            globalRegistry_FlagVars.push(`${chkChildItemValidVariableName}`);
+            console.log(`Global variable ${chkChildItemValidVariableName} added to globalRegistry_FlagVars`);
+            console.log(`globalRegistry_FlagVars : ${globalRegistry_FlagVars}`);
+        }
+
+
+    } else { // 하위 항목 산출식 검증 버튼 클릭했는지 체크하는 플래그 변수 값을 N으로 설정
+        window[`Flag_chkChildItemValid_${parentItemDataRow.PARENTITEMIDX}`] = "N";
+        console.log(`Flag_chkChildItemValid_${parentItemDataRow.PARENTITEMIDX} value is changed to ` + window[`Flag_chkChildItemValid_${parentItemDataRow.PARENTITEMIDX}`]);
+    }
+
+
+
+
+    ////만약 처음 클릭한 것이라면 하위 항목 두 개 만들기
+    //if (window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] == 1) {
+    //    for (let i = 0; i < 2; i++) {
+    //        createChildItemElement_editMode(parentItemDataRow);
+    //    }
+
+    //    let element_label = document.getElementById(`label_calCulatorItem_${parentItemDataRow.PARENTITEMIDX}`);
+    //    element_label.style.display = "";
+
+
+    //    //산출식 검증 버튼 노출
+    //    let element_btn_chkChildIndicatorItemCalCulator = document.getElementById(`btn_chkChildIndicatorItemCalCulator_${parentItemDataRow.PARENTITEMIDX}`);
+    //    element_btn_chkChildIndicatorItemCalCulator.style.display = "";
+
+
+    //}
+    //else {
+    //    createChildItemElement_editMode(parentItemDataRow);
+    //}
+
+
+    createChildItemElement_editMode(parentItemDataRow);
+
+}
+
+
+
+
+// 세부입력값의 하위 항목 요소들 데이터 바인딩해주는 함수
+function createChildItemElement_editMode(parentItemDataRow) {
+    //하위 항목 카운팅 변수 받아오기
+    let childItemCountNum = window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`];
+
+
+    //하위 항목 카운팅 변수를 배열에 저장하기
+    const arrayName = `Arr_childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`;
+    if (typeof window[arrayName] !== undefined) {
+        window[arrayName].push(`${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`);
+        console.log(`Value added to ${arrayName}:`, window[arrayName]);
+    } else {
+        console.log(`Global array ${arrayName} is not defiend.`);
+    }
+
+    //산출식 입력폼에 Placeholder 채워넣기
+    let placeHolderString = "";
+    for (let i = 0; i < window[arrayName].length; i++) {
+        if (placeHolderString.length > 0) placeHolderString += "+";
+        placeHolderString += window[arrayName][i];
+    }
+    let element_calCulatorItem = document.getElementById(`calCulatorItem_${parentItemDataRow.PARENTITEMIDX}`);
+    element_calCulatorItem.style.display = "";
+    element_calCulatorItem.setAttribute("placeholder", `예시 : ${placeHolderString}`);
+
+    //새로운 div 요소 생성
+    let newDiv = document.createElement("div");
+    newDiv.setAttribute("name", `indicatorChildItem_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`);
+    newDiv.style.padding = "3px";
+
+    //새로운 label 요소 생성 (for indicatorChildItem_A1)
+    let newChildLabel = document.createElement("label");
+    newChildLabel.setAttribute("for", `indicatorChildItem_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`);
+    newChildLabel.style.marginRight = "5px";
+    newChildLabel.innerText = `${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`;
+
+    //새로운 input 요소 생성 (name=indicatorChildItem_A1)
+    let newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.className = "txt";
+    newInput.id = `indicatorChildItem_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`;
+    newInput.name = `indicatorChildItem_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`;
+    newInput.value = parentItemDataRow.INDICATORITEMTITLE;
+    newInput.onkeyup = function () {
+        //searchItemList(this.id);
+        debounceSearchItemList(this.id);
+
+    }
+
+    //새로운 input hidden 요소 생성
+    let newInputHidden = document.createElement("input");
+    newInputHidden.type = "hidden";
+    newInputHidden.id = `indicatorChildItem_idx_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`;
+    newInputHidden.name = `indicatorChildItem_idx_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`;
+    newInputHidden.value = parentItemDataRow.INDIDX;
+
+    //새로운 searchResult 요소 생성
+    let newSearchResultDiv = document.createElement("div");
+    newSearchResultDiv.id = `searchItemResult${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`;
+    newSearchResultDiv.style.display = "none";
+    newSearchResultDiv.className = "search-result";
+
+
+    //newDiv 에 추가된 요소들 추가            
+    newDiv.appendChild(newChildLabel);
+    newDiv.appendChild(newInput);
+    newDiv.appendChild(newInputHidden);
+    newDiv.appendChild(newSearchResultDiv);
+
+
+    //새로운 삭제 버튼 생성 (첫 번째 하위 항목에는 삭제버튼 만들지 말기)
+    if (childItemCountNum !== 1) {
+
+
+        let deleteButton = document.createElement("button");
+        deleteButton.innerText = "-";
+        deleteButton.style.backgroundColor = "lightcoral";
+        deleteButton.style.marginLeft = "5px";
+        deleteButton.onclick = function () {
+
+            //삭제 버튼 클릭 시 해당 div 요소 제거
+            if (document.getElementById(`indicatorChildItem_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum + 1}`)) {
+                alert('항목을 차례대로 삭제해주세요.');
+                return false;
+            }
+            else {
+
+                //만약 두 번째 항목을 삭제한 경우에는 child1,child2 요소 두 개 다 지우기
+                if (window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] == 3) {
+                    document.getElementById(`indicatorChildItem_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`).parentElement.remove();
+                    document.getElementById(`indicatorChildItem_${parentItemDataRow.PARENTITEMIDX}${childItemCountNum - 1}`).parentElement.remove();
+
+                    //하위 항목 카운팅 변수 저장 배열 초기화해주기
+                    window[arrayName].length = 0;
+
+                    //하위 항목 카운팅 변수 2 줄이기
+                    window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] = window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] - 2;
+
+                    //하위 항목 산출식 검증 버튼 클릭했는지 체크하는 전역 변수 삭제하기
+                    let deleteChkChildItemValidationVariableName = `Flag_chkChildItemValid_${parentItemDataRow.PARENTITEMIDX}`;
+                    delete window[deleteChkChildItemValidationVariableName];
+                    console.log(`Global Variable Delete, Variable Name : ${deleteChkChildItemValidationVariableName}`);
+                }
+                else {
+                    newDiv.remove();
+
+                    //하위 항목 카운팅 변수 저장 배열에서 해당 항목 삭제하기
+                    const index = window[arrayName].indexOf(`${parentItemDataRow.PARENTITEMIDX}${childItemCountNum}`);
+                    if (index > -1) {
+                        window[arrayName].splice(index, 1);
+                    }
+
+                    //산출식 입력폼 Placeholder에서 해당 요소 빼주기
+                    placeHolderString = "";
+                    for (let i = 0; i < window[arrayName].length; i++) {
+                        if (placeHolderString.length > 0) placeHolderString += "+";
+                        placeHolderString += window[arrayName][i];
+                    }
+                    element_calCulatorItem.setAttribute("placeholder", `예시 : ${placeHolderString}`);
+
+
+                    //하위 항목 카운팅 변수 1 줄이기
+                    window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] = window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] - 1;
+
+                    //하위 항목 산출식 검증 Flag 변수를 N으로 바꿔주기
+                    const FlagVariableName = `Flag_chkChildItemValid_${parentItemDataRow.PARENTITEMIDX}`;
+                    window[FlagVariableName] = "N";
+                    console.log(`${FlagVariableName} value is changed to ${window[FlagVariableName]}`);
+                }
+
+            }
+
+            //만약 하위 항목 다 지웠을 경우에는 산출식 부분 값 초기화해주기.
+            if (window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] == 1) {
+                let element_label = document.getElementById(`label_calCulatorItem_${parentItemDataRow.PARENTITEMIDX}`);
+                element_label.style.display = "none";
+
+                let element_calCulatorItem = document.getElementById(`calCulatorItem_${parentItemDataRow.PARENTITEMIDX}`);
+                element_calCulatorItem.style.display = "none";
+                element_calCulatorItem.value = "";
+
+
+                let element_btn_chkChildIndicatorItemCalCulator = document.getElementById(`btn_chkChildIndicatorItemCalCulator_${parentItemDataRow.PARENTITEMIDX}`);
+                element_btn_chkChildIndicatorItemCalCulator.style.display = "none";
+
+            }
+        }
+        newDiv.appendChild(deleteButton);
+    }
+
+    // indicatorChildItemArea 에 newDiv 요소 추가
+    let indicatorChildItemArea = document.getElementById(`indicatorChildItemArea_${parentItemDataRow.PARENTITEMIDX}`);
+    indicatorChildItemArea.appendChild(newDiv);
+
+    // 하위 항목 카운팅 변수 1 증가시키기
+    window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] = window[`childItemCountingVariable_${parentItemDataRow.PARENTITEMIDX}`] + 1;
+}
